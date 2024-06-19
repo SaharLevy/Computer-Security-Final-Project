@@ -11,4 +11,7 @@ const sequelize = new Sequelize(
   }
 );
 
+const User = require("./user");
+
 module.exports = sequelize;
+module.exports.User = User;

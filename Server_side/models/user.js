@@ -20,6 +20,10 @@ const User = sequelize.define("User", {
     type: DataTypes.STRING,
     allowNull: false,
   },
+  passwordHistory: {
+    type: DataTypes.JSON, // Store an array of previous passwords
+    defaultValue: [],
+  },
 });
 
 module.exports = User;
