@@ -1,15 +1,16 @@
-const User = require("../models/user");
+const { User } = require("../models");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
-const validatePassword = require("../utils/validatePassword");
+const validatePassword = require("../utils/passwordValidator");
 
 const saltRounds = 10;
 
 exports.register = async (req, res) => {
   const { userName, mail, password } = req.body;
+  console.log(req.body);
 
   // Validate password
-  const validationErrors = validatePassword.validatePassword(password);
+  const validationErrors = validatePassword(password);
   if (validationErrors.length > 0) {
     return res.status(400).json({ errors: validationErrors });
   }
