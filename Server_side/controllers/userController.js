@@ -9,13 +9,13 @@ exports.register = async (req, res) => {
   const { userName, mail, password } = req.body;
   console.log(req.body);
 
-  // Validate password
-  const validationErrors = validatePassword(password);
-  if (validationErrors.length > 0) {
-    return res.status(400).json({ errors: validationErrors });
-  }
-
   try {
+    // Validate password
+    const validationErrors = validatePassword(password);
+    if (validationErrors.length > 0) {
+      return res.status(400).json({ errors: validationErrors });
+    }
+
     // Check if user already exists
     const existingUser = await User.findOne({ where: { mail } });
     if (existingUser) {
