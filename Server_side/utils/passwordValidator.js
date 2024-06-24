@@ -4,7 +4,6 @@ const passwordConfig = require("../config/passwordConfig");
 function validatePassword(password) {
   const rules = [];
   const forbiddenWords = ["apple", "noob"];
-
   if (password.length < passwordConfig.passwordLength) {
     rules.push(
       `Password must be at least ${passwordConfig.passwordLength} characters long.`
@@ -46,6 +45,8 @@ function validatePassword(password) {
     error.details = rules;
     throw error;
   }
+
+  return rules;
 }
 
 module.exports = validatePassword;
