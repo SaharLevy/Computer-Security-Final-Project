@@ -23,6 +23,14 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.JSON, // Store an array of previous passwords
       defaultValue: [],
     },
+    resetPasswordToken: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    resetPasswordExpires: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
   });
 
   return User;

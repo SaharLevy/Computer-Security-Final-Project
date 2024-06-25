@@ -16,3 +16,13 @@ exports.insertNewClient = async (req, res) => {
     res.status(500).json({ error: "Internal server error." });
   }
 };
+
+exports.getAllClients = async (req, res) => {
+  try {
+    const clients = await Client.findAll();
+    res.status(200).json(clients);
+  } catch (error) {
+    console.error("Error during fetching clients:", error);
+    res.status(500).json({ error: "Internal server error." });
+  }
+};
