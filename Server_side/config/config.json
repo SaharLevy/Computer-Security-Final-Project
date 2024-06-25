@@ -4,7 +4,10 @@
     "password": "5504463",
     "database": "myapp",
     "host": "localhost",
-    "dialect": "mysql"
+    "dialect": "mysql",
+    "dialectOptions": {
+      "multipleStatements": true
+    }
   },
   "test": {
     "username": "root",

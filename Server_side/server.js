@@ -2,6 +2,7 @@ const express = require("express");
 //const mysql = require("mysql2");
 const userRoutes = require("./routes/userRoutes");
 const systemRoutes = require("./routes/systemRoutes");
+const unsafeRoutes = require("./routes/unsafeRoutes");
 //const sequelize = require("./models/index");
 const dotenv = require("dotenv");
 const db = require("./models");
@@ -12,6 +13,7 @@ const port = process.env.PORT;
 
 app.use(express.json());
 
+app.use("/api/unsafe", unsafeRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/system", systemRoutes);
 
