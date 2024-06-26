@@ -46,3 +46,59 @@ exports.register = async (req, res) => {
     res.status(500).json({ error: "Internal server error." });
   }
 };
+
+exports.login = async (req, res) => {
+  const { mail, password } = req.body;
+
+  try {
+    // Unsafe raw SQL query
+    const userCheckQuery = `SELECT * FROM Users WHERE mail = '${mail}'`;
+    console.log("Executing query:", userCheckQuery); // Log the query for debugging
+    const [userResult] = await sequelize.query(userCheckQuery);
+    console.log("Query result:", userResult); // Log the query result for debugging
+
+    if (userResult.length === 0) {
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    const user = userResult[0];
+    console.log("Found user:", user); // Log the found user for debugging
+
+    // Check if password is correct
+    const isPasswordCorrect = await bcrypt.compare(password, user.password);
+    if (!isPasswordCorrect) {
+      return res.status(401).json({ error: "Incorrect password." });
+    }
+
+    // Authentication successful
+    res.status(200).json({ message: "Login successful." });
+  } catch (error) {
+    console.error("Error during login:", error);
+    res.status(500).json({ error: "Internal server error." });
+  }
+};
+
+exports.insertNewClient = async (req, res) => {
+  const { fullName, mail } = req.body;
+
+  try {
+    // Unsafe raw SQL query to check if client exists
+    const clientCheckQuery = `SELECT * FROM Clients WHERE mail = '${mail}'`;
+    console.log("Executing query:", clientCheckQuery); // Log the query for debugging
+    const [clientResult] = await sequelize.query(clientCheckQuery);
+
+    if (clientResult.length > 0) {
+      return res.status(400).json({ error: "Client already exists." });
+    }
+
+    // Unsafe raw SQL query to insert a new client
+    const insertClientQuery = `INSERT INTO Clients (fullName, mail) VALUES ('${fullName}', '${mail}')`;
+    console.log("Executing query:", insertClientQuery); // Log the query for debugging
+    await sequelize.query(insertClientQuery);
+
+    res.status(201).json({ message: `${fullName} registered successfully.` });
+  } catch (error) {
+    console.error("Error during registration:", error);
+    res.status(500).json({ error: "Internal server error." });
+  }
+};
