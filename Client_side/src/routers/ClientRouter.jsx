@@ -7,7 +7,7 @@ function ClientRouter() {
   return (
     <Router>
       <Routes>
-        <Route exact path="/" element={SystemPage} />
+        <Route exact path="/" element={<SystemPage />} />
       </Routes>
     </Router>
   );

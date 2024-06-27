@@ -1,6 +1,6 @@
 // src/App.jsx
 import React from "react";
-import { ClientRouter } from "./routers/ClientRouter";
+import ClientRouter from "./routers/ClientRouter";
 function App() {
   return (
     <>
