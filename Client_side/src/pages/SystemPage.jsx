@@ -1,7 +1,15 @@
+import AddClientForm from "../components/AddClientForm";
+import { useState } from "react";
+import GetClients from "../components/GetClients";
+
 const SystemPage = () => {
+  const [clients, setClients] = useState([]);
+  console.log("Clients in SystemPage:", clients);
+
   return (
     <>
-      <h1>this is the system page!</h1>
+      <AddClientForm />
+      <GetClients clients={clients} setClients={setClients} />
     </>
   );
 };

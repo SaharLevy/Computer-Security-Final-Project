@@ -6,10 +6,17 @@ const unsafeRoutes = require("./routes/unsafeRoutes");
 //const sequelize = require("./models/index");
 const dotenv = require("dotenv");
 const db = require("./models");
+const cors = require("cors");
 
 dotenv.config();
 const app = express();
 const port = process.env.PORT;
+
+app.use(
+  cors({
+    origin: "http://localhost:5173", // Allow requests from this origin
+  })
+);
 
 app.use(express.json());
 
