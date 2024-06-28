@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Container, Box } from "@mui/material";
+import { Container, Box, Typography, Paper } from "@mui/material";
 
 export default function GetClients({ clients, setClients }) {
   useEffect(() => {
@@ -18,8 +18,9 @@ export default function GetClients({ clients, setClients }) {
     };
     fetchClients();
   }, [clients]);
+
   return (
-    <Container maxWidth="sm" sx={{ mt: 0 }}>
+    <Container maxWidth="sm" sx={{ mt: 4 }}>
       <Box
         sx={{
           display: "flex",
@@ -27,12 +28,40 @@ export default function GetClients({ clients, setClients }) {
           alignItems: "center",
         }}
       >
-        <h1>Clients</h1>
-        <ul>
+        <Typography
+          variant="h4"
+          component="h1"
+          gutterBottom
+          sx={{ textAlign: "center" }}
+        >
+          Clients
+        </Typography>
+        <Box
+          component="ul"
+          sx={{
+            listStyleType: "none",
+            padding: 0,
+            width: "100%",
+          }}
+        >
           {clients.map((client) => (
-            <li key={client.id}>{client.fullName}</li>
+            <Paper
+              key={client.id}
+              sx={{
+                padding: 2,
+                margin: 1,
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <Typography variant="body1">{client.fullName}</Typography>
+              <Typography variant="body2" color="textSecondary">
+                {client.mail}
+              </Typography>
+            </Paper>
           ))}
-        </ul>
+        </Box>
       </Box>
     </Container>
   );
