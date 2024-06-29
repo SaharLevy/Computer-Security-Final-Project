@@ -143,10 +143,10 @@ exports.forgottenPassword = async (req, res) => {
       from: { name: "Sahar Levy", address: process.env.EMAIL_USER },
       to: user.mail,
       subject: "Password Reset",
-      text: `You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n
-             Please click on the following link, or paste this into your browser to complete the process:\n\n
-             http://localhost:3001/reset/${token}\n\n
-             If you did not request this, please ignore this email and your password will remain unchanged.\n`,
+      text: `You are receiving this because you (or someone else) have requested the reset of the password for your account.\n
+Please paste this into your browser to complete the process:\n
+             ${token}\n\n
+If you did not request this, please ignore this email and your password will remain unchanged.\n`,
     };
 
     transporter.sendMail(mailOptions, (err, info) => {
@@ -168,4 +168,84 @@ const checkPasswordHistory = (newPassword, passwordHistory) => {
   return passwordHistory.some(async (oldPassword) => {
     return await bcrypt.compare(newPassword, oldPassword);
   });
+};
+
+exports.verifyToken = async (req, res) => {
+  const { mail, token } = req.body;
+
+  try {
+    // Check if user exists
+    const user = await User.findOne({ where: { mail } });
+    if (!user) {
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    // Check if token is valid
+    if (
+      user.resetPasswordToken !== token ||
+      Date.now() > user.resetPasswordExpires
+    ) {
+      return res.status(400).json({ error: "Invalid or expired token." });
+    }
+
+    res.status(200).json({ message: "Token is valid." });
+  } catch (error) {
+    console.error("Error during token verification:", error);
+    res.status(500).json({ error: "Internal server error." });
+  }
+};
+
+exports.changePasswordWithoutOld = async (req, res) => {
+  const { mail, token, newPassword } = req.body;
+
+  try {
+    // Check if user exists
+    console.log("Finding user with mail:", mail);
+    const user = await User.findOne({ where: { mail } });
+    if (!user) {
+      console.log("User not found");
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    // Check if token is valid
+    console.log("Checking token validity for user:", user.mail);
+    if (
+      user.resetPasswordToken !== token ||
+      Date.now() > user.resetPasswordExpires
+    ) {
+      console.log("Invalid or expired token");
+      return res.status(400).json({ error: "Invalid or expired token." });
+    }
+
+    // Validate new password
+    console.log("Validating new password");
+    const validationErrors = validatePassword(newPassword);
+    if (validationErrors.length > 0) {
+      console.log("Validation errors:", validationErrors);
+      return res.status(400).json({ errors: validationErrors });
+    }
+
+    // Hash new password with HMAC + salt
+    console.log("Hashing new password");
+    const salt = await bcrypt.genSalt(saltRounds);
+    const hashedNewPassword = await bcrypt.hash(newPassword, salt);
+
+    // Update user's password and clear the reset token
+    console.log("Updating user password");
+    user.password = hashedNewPassword;
+    user.resetPasswordToken = null;
+    user.resetPasswordExpires = null;
+    await user.save();
+
+    console.log("Password changed successfully for user:", user.mail);
+    return res.status(200).json({ message: "Password changed successfully." });
+  } catch (error) {
+    console.error("Error during password change:", error);
+
+    if (error.details) {
+      return res.status(400).json({ errors: error.details });
+    }
+
+    return res.status(500).json({ error: "Internal server error." });
+  }
 };
