@@ -8,31 +8,37 @@ exports.register = async (req, res) => {
   const { userName, mail, password } = req.body;
 
   try {
-    // Validate password (optional)
+    // Validate password
     const validationErrors = validatePassword(password);
     if (validationErrors.length > 0) {
+      console.log("Validation errors:", validationErrors);
       return res.status(400).json({ errors: validationErrors });
     }
 
     // Check if user already exists using raw query (unsafe)
     const userCheckQuery = `SELECT * FROM Users WHERE mail = '${mail}'`;
+    console.log("Executing query:", userCheckQuery);
     const [existingUser] = await sequelize.query(userCheckQuery);
 
     if (existingUser.length > 0) {
+      console.log("User already exists with email:", mail);
       return res.status(400).json({ error: "Email already in use." });
     }
 
     // Hash password with HMAC + salt
+    console.log("Hashing password for user:", userName);
     const salt = await bcrypt.genSalt(saltRounds);
     const hashedPassword = await bcrypt.hash(password, salt);
 
     // Create user using raw query (unsafe)
     const createUserQuery = `
-      INSERT INTO Users (userName, mail, password, passwordHistory)
-      VALUES ('${userName}', '${mail}', '${hashedPassword}', '["${hashedPassword}"]')
+      INSERT INTO Users (userName, mail, password, passwordHistory, createdAt, updatedAt)
+      VALUES ('${userName}', '${mail}', '${hashedPassword}', '["${hashedPassword}"]', NOW(), NOW())
     `;
+    console.log("Executing query:", createUserQuery);
     await sequelize.query(createUserQuery);
 
+    console.log("User registered successfully:", userName);
     res.status(201).json({ message: "User registered successfully." });
   } catch (error) {
     console.error("Error during registration:", error);
@@ -84,7 +90,7 @@ exports.insertNewClient = async (req, res) => {
   try {
     // Unsafe raw SQL query to check if client exists
     const clientCheckQuery = `SELECT * FROM Clients WHERE mail = '${mail}'`;
-    console.log("Executing query:", clientCheckQuery); // Log the query for debugging
+    console.log("Executing query:", clientCheckQuery);
     const [clientResult] = await sequelize.query(clientCheckQuery);
 
     if (clientResult.length > 0) {
@@ -92,8 +98,8 @@ exports.insertNewClient = async (req, res) => {
     }
 
     // Unsafe raw SQL query to insert a new client
-    const insertClientQuery = `INSERT INTO Clients (fullName, mail) VALUES ('${fullName}', '${mail}')`;
-    console.log("Executing query:", insertClientQuery); // Log the query for debugging
+    const insertClientQuery = `INSERT INTO Clients (fullName, mail, createdAt, updatedAt) VALUES ('${fullName}', '${mail}', NOW(), NOW())`;
+    console.log("Executing query:", insertClientQuery);
     await sequelize.query(insertClientQuery);
 
     res.status(201).json({ message: `${fullName} registered successfully.` });

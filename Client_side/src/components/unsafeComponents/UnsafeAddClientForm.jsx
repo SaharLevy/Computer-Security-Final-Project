@@ -8,7 +8,7 @@ import {
   Paper,
 } from "@mui/material";
 
-export default function AddClientForm({ onClientAdded }) {
+export default function UnsafeAddClientForm({ onClientAdded }) {
   const [name, setName] = useState("");
   const [mail, setMail] = useState("");
   const [message, setMessage] = useState("");
@@ -16,26 +16,31 @@ export default function AddClientForm({ onClientAdded }) {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    const response = await fetch(
-      "http://localhost:3001/api/system/insertNewClient",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ fullName: name, mail }),
+    try {
+      const response = await fetch(
+        "http://localhost:3001/api/unsafe/insertNewClient",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ fullName: name, mail }),
+        }
+      );
+
+      const result = await response.json();
+
+      if (response.ok) {
+        setMessage(`Client ${result.message} registered successfully.`);
+        setName("");
+        setMail("");
+        onClientAdded(); // Trigger client update
+      } else {
+        setMessage(`Error: ${result.error}`);
       }
-    );
-
-    const result = await response.json();
-
-    if (response.ok) {
-      setMessage(`Client ${result.fullName} registered successfully.`);
-      setName("");
-      setMail("");
-      onClientAdded(); // Trigger client update
-    } else {
-      setMessage(`Error: ${result.error}`);
+    } catch (error) {
+      console.error("Error during client registration:", error);
+      setMessage("Error: Could not register client.");
     }
   };
 
@@ -75,7 +80,7 @@ export default function AddClientForm({ onClientAdded }) {
           />
           <TextField
             label="Email"
-            type="email"
+            type="text" // Change type to text to allow SQL injection testing
             value={mail}
             onChange={(e) => setMail(e.target.value)}
             fullWidth

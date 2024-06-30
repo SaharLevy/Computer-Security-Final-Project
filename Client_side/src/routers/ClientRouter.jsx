@@ -7,6 +7,9 @@ import LoginPage from "../pages/LoginPage";
 import ChangePasswordPage from "../pages/ChangePasswordPage";
 import ForgottenPasswordPage from "../pages/ForgottenPasswordPage";
 import ChangePasswordWithoutOldPage from "../pages/ChangePasswordWithoutOldPage";
+import UnsafeLoginPage from "../pages/unsafePages/UnsafeLoginPage";
+import UnsafeRegisterPage from "../pages/unsafePages/UnsafeRegisterPage";
+import UnsafeSystemPage from "../pages/unsafePages/UnsafeSystemPage";
 
 function ClientRouter() {
   return (
@@ -21,6 +24,9 @@ function ClientRouter() {
           path="/resetpassword"
           element={<ChangePasswordWithoutOldPage />}
         />
+        <Route path="/unsafeLogin" element={<UnsafeLoginPage />} />
+        <Route path="/unsafeRegister" element={<UnsafeRegisterPage />} />
+        <Route path="/unsafeSystem" element={<UnsafeSystemPage />} />
       </Routes>
     </Router>
   );

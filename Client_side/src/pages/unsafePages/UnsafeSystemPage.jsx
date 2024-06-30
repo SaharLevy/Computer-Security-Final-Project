@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import AddClientForm from "../components/AddClientForm";
-import GetClients from "../components/GetClients";
+import UnsafeAddClientForm from "../../components/unsafeComponents/UnsafeAddClientForm";
+import UnsafeGetClients from "../../components/unsafeComponents/UnsafeGetClients";
 
-const SystemPage = () => {
+const UnsafeSystemPage = () => {
   const [clients, setClients] = useState([]);
   const [updateTrigger, setUpdateTrigger] = useState(0);
 
@@ -29,10 +29,10 @@ const SystemPage = () => {
 
   return (
     <>
-      <AddClientForm onClientAdded={handleClientAdded} />
-      <GetClients clients={clients} />
+      <UnsafeAddClientForm onClientAdded={handleClientAdded} />
+      <UnsafeGetClients clients={clients} />
     </>
   );
 };
 
-export default SystemPage;
+export default UnsafeSystemPage;

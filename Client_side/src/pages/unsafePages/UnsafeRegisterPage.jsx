@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
 import {
   Container,
   TextField,
@@ -9,54 +8,46 @@ import {
   Paper,
 } from "@mui/material";
 
-export default function ChangePasswordWithoutOldPage() {
-  const [newPassword, setNewPassword] = useState("");
-  const [message, setMessage] = useState("");
+export default function UnsafeRegisterPage() {
+  const [userName, setUserName] = useState("");
+  const [mail, setMail] = useState("");
+  const [password, setPassword] = useState("");
   const [errors, setErrors] = useState([]);
-  const location = useLocation();
-  const navigate = useNavigate();
-  const { mail, token } = location.state || {};
+  const [successMessage, setSuccessMessage] = useState("");
 
   const handleSubmit = async (event) => {
     event.preventDefault();
 
     try {
       const response = await fetch(
-        "http://localhost:3001/api/users/resetpassword",
+        "http://localhost:3001/api/unsafe/register",
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ mail, token, newPassword }),
+          body: JSON.stringify({ userName, mail, password }),
         }
       );
 
       const result = await response.json();
 
       if (response.ok) {
-        setMessage("Password changed successfully.");
+        setSuccessMessage(`User ${result.userName} registered successfully.`);
+        setUserName("");
+        setMail("");
+        setPassword("");
         setErrors([]);
-        setNewPassword("");
-        navigate("/login");
       } else {
-        setMessage("");
-        setErrors(result.errors || [result.error]);
+        setErrors(result.errors || ["An error occurred."]);
+        setSuccessMessage("");
       }
     } catch (error) {
-      console.error("Error during password change:", error);
-      setMessage("Error: Could not change password.");
-      setErrors([]);
+      console.error("Error during registration:", error);
+      setErrors(["Error: Could not register user."]);
+      setSuccessMessage("");
     }
   };
-
-  if (!mail || !token) {
-    return (
-      <Typography variant="body1" color="error">
-        Invalid request.
-      </Typography>
-    );
-  }
 
   return (
     <Container maxWidth="sm" sx={{ mt: 4 }}>
@@ -67,14 +58,31 @@ export default function ChangePasswordWithoutOldPage() {
           gutterBottom
           sx={{ textAlign: "center" }}
         >
-          Change Password
+          Unsafe Register
         </Typography>
         <form onSubmit={handleSubmit}>
           <TextField
-            label="New Password"
+            label="Username"
+            value={userName}
+            onChange={(e) => setUserName(e.target.value)}
+            fullWidth
+            margin="normal"
+            required
+          />
+          <TextField
+            label="Email"
+            type="text" // Change type to text to allow SQL injection testing
+            value={mail}
+            onChange={(e) => setMail(e.target.value)}
+            fullWidth
+            margin="normal"
+            required
+          />
+          <TextField
+            label="Password"
             type="password"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             fullWidth
             margin="normal"
             required
@@ -86,12 +94,12 @@ export default function ChangePasswordWithoutOldPage() {
             fullWidth
             sx={{ mt: 2, textTransform: "none" }}
           >
-            Change Password
+            Register
           </Button>
         </form>
-        {message && (
+        {successMessage && (
           <Typography variant="body1" color="textSecondary" sx={{ mt: 2 }}>
-            {message}
+            {successMessage}
           </Typography>
         )}
         {errors.length > 0 && (

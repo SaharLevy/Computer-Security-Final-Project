@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { Container, Box, Typography, Paper } from "@mui/material";
 
-export default function GetClients({ clients, setClients }) {
+export default function UnsafeGetClients({ clients, setClients }) {
   useEffect(() => {
     const fetchClients = async () => {
       try {
