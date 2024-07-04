@@ -6,4 +6,5 @@ module.exports = {
   requireSpecialChars: true,
   passwordHistoryLimit: 3,
   denyDictionaryWords: true,
+  loginTries: 3,
 };

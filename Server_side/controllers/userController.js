@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 const validatePassword = require("../utils/passwordValidator");
 const nodemailer = require("nodemailer");
+const passwordConfig = require("../config/passwordConfig");
 
 const saltRounds = 10;
 
@@ -52,17 +53,35 @@ exports.login = async (req, res) => {
   const { mail, password } = req.body;
 
   try {
-    // Check if user exists
     const user = await User.findOne({ where: { mail } });
+
     if (!user) {
       return res.status(404).json({ error: "User not found." });
     }
+
+    if (user.lockUntil && user.lockUntil > Date.now()) {
+      return res
+        .status(403)
+        .json({ error: "Account locked. Try again later." });
+    }
+
     const isPasswordCorrect = await bcrypt.compare(password, user.password);
+
     if (!isPasswordCorrect) {
+      user.loginAttempts += 1;
+
+      if (user.loginAttempts >= passwordConfig.loginTries) {
+        user.lockUntil = new Date(Date.now() + 15 * 60 * 1000); // Lock for 15 minutes
+      }
+
+      await user.save();
       return res.status(401).json({ error: "Incorrect password." });
     }
 
-    // Authentication successful
+    user.loginAttempts = 0;
+    user.lockUntil = null;
+    await user.save();
+
     res.status(200).json({ message: "Login successful." });
   } catch (error) {
     console.error("Error during login:", error);

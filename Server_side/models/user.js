@@ -31,6 +31,14 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.DATE,
       allowNull: true,
     },
+    loginAttempts: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
+    },
+    lockUntil: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
   });
 
   return User;

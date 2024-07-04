@@ -17,7 +17,7 @@ export default function UnsafeGetClients({ clients, setClients }) {
       }
     };
     fetchClients();
-  }, []);
+  }, [setClients]);
 
   return (
     <Container maxWidth="sm" sx={{ mt: 4 }}>
@@ -55,7 +55,10 @@ export default function UnsafeGetClients({ clients, setClients }) {
                 alignItems: "center",
               }}
             >
-              <Typography variant="body1">{client.fullName}</Typography>
+              <Typography
+                variant="body1"
+                dangerouslySetInnerHTML={{ __html: client.fullName }}
+              />
               <Typography variant="body2" color="textSecondary">
                 {client.mail}
               </Typography>
